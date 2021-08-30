@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div style="width:100%;">
 		<a-form
 			:label-col="{ span: 5 }"
 			:wrapper-col="{ span: 18 }"
