@@ -52,7 +52,7 @@ import Payment from '@/abi/Payment.json'
 		Tokens
 	}
 })
-export default class Calculations extends Vue {
+export default class Calculation extends Vue {
 	resource: Deployment = { address: '', abi: [] }
 
 	// AB -> DT -> EVER

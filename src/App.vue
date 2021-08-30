@@ -24,8 +24,8 @@
 					<router-link to="/" />
 				</a-menu-item>
 				<a-menu-item key="2">
-					<span>Calculations</span>
-					<router-link to="/calculations" />
+					<span>Calculation</span>
+					<router-link to="/calculation" />
 				</a-menu-item>
 				<a-menu-item key="3">
 					<span>Resources</span>
