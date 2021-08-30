@@ -1,23 +1,17 @@
 <template>
-	<div>
+	<div style="width:100%;">
 		<a-form
-			:form="form"
 			:label-col="{ span: 5 }"
-			:wrapper-col="{ span: 12 }"
+			:wrapper-col="{ span: 16 }"
 		>
 			<a-form-item label="Resource">
-				<a-input v-model="resource" />
+				<Resources @onResourceChanged="onResourceChanged" />
 			</a-form-item>
-			<a-form-item label="Resource pre path">
+			<a-form-item label="Pre path">
 				<a-input v-model="prePath" />
 			</a-form-item>
 			<a-form-item label="Value In">
 				<a-input v-model="valueIn" />
-			</a-form-item>
-			<a-form-item label="Amount resource">
-				<a-input v-model="amountOut" />
-			</a-form-item>
-			<a-form-item :wrapper-col="{ span: 12, offset: 5 }">
 				<a-button
 					type="primary"
 					html-type="submit"
@@ -25,6 +19,10 @@
 				>
 					Get Amount Out
 				</a-button>
+				<div>Resource AmountOut: {{ resourceOut }}</div>
+			</a-form-item>
+			<a-form-item label="Amount resource">
+				<a-input v-model="amountOut" />
 				<a-button
 					style="margin-left:8px;"
 					type="primary"
@@ -33,56 +31,64 @@
 				>
 					Get Values In
 				</a-button>
+				<div>Resource ValuesIn: {{ valuesIn }}</div>
 			</a-form-item>
 		</a-form>
-		<div>Resource AmountOut: {{ resourceOut }}</div>
-		<div>Resource ValuesIn: {{ valuesIn }}</div>
 	</div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { utils } from 'ethers'
+
 import { toToken, formatToken } from '@/utils'
-import { call } from '@/utils/eth'
-
+import { call, Deployment } from '@/utils/eth'
+import Resources from '@/components/resources.vue'
+import Tokens from '@/components/tokens.vue'
 import Payment from '@/abi/Payment.json'
-import MockAB from '@/abi/MockAB.json'
-import SimpleResourceERC20 from '@/abi/SimpleResourceERC20.json'
 
-@Component
+@Component({
+	components: {
+		Resources,
+		Tokens
+	}
+})
 export default class Calculations extends Vue {
-	form = {}
+	resource: Deployment = { address: '', abi: [] }
 
-	resource = '0x66D575cA7e77C53679Dd49bcDd64075e621E01f9'
 	// AB -> DT -> EVER
 	prePath =
 		'0x7a6ca1B5e1e5DDd9E5F4b4f685319f990A5585Db,0x455d2b264DC5b543014E24f8599b3E8177f73654,0xc0D05413823E6ebeA748285d468295eB384057A9'
 	valueIn = '0'
 	amountOut = '0'
+
 	resourceOut = '0'
 	valuesIn = ''
 
-	paymentInterface = new utils.Interface(Payment.abi)
-	abInterface = new utils.Interface(MockAB.abi)
-	simpleResourceERC20Inteface = new utils.Interface(SimpleResourceERC20.abi)
-	erc20Interface = new utils.Interface(MockAB.abi)
+	async onResourceChanged(resource: Deployment) {
+		this.resource = resource
+	}
 
 	async getAmountOut() {
-		const tokens = this.prePath.split(',')
-		const result = await call(Payment, 'getAmountOut', [
-			this.resource,
-			tokens,
-			toToken(this.valueIn)
-		])
-		this.resourceOut = result.toString()
-		return this.resourceOut
+		try {
+			const tokens = this.prePath.split(',')
+			const result = await call(Payment, 'getAmountOut', [
+				this.resource.address,
+				tokens,
+				toToken(this.valueIn)
+			])
+			this.resourceOut = result.toString()
+			return this.resourceOut
+		} catch (e) {
+			this.$message.error({
+				content: JSON.stringify(e)
+			})
+		}
 	}
 
 	async getValuesIn() {
 		const tokens = this.prePath.split(',')
 		const result = await call(Payment, 'getValuesIn', [
-			this.resource,
+			this.resource.address,
 			tokens,
 			this.amountOut
 		])

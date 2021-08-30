@@ -1,12 +1,15 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
+import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
-import { Form, Button, Input } from 'ant-design-vue'
+Vue.use(Antd)
 
-Vue.use(Form)
-Vue.use(Button)
-Vue.use(Input)
+import { message } from 'ant-design-vue'
+Vue.prototype.$message = message
+message.config({
+	duration: 5,
+})
 
 Vue.config.productionTip = false
 

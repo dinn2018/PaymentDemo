@@ -18,15 +18,15 @@ declare global {
 			isMetaMask: boolean,
 			selectedAddress: string,
 			request: (options: {
-				method: 'eth_sendTransaction' | 'eth_call' | 'eth_requestAccounts' | 'eth_accounts',
+				method: 'eth_sendTransaction' | 'eth_call' | 'eth_requestAccounts' | 'eth_accounts' | 'eth_getBalance',
 				params?: {
-					from: string
-					to: string
+					from?: string
+					to?: string
 					gas?: string
 					gasPrice?: string
 					value?: string
 					data?: string
-				}[]
+				}[] | any[]
 			}) => Promise<any>
 		}
 	}

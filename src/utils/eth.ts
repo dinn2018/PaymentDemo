@@ -1,29 +1,33 @@
 import { utils } from 'ethers'
 
+export interface Deployment {
+	address: string,
+	abi: any[]
+}
+
+export interface CallOption {
+	from?: string,
+	to?: string,
+	value?: string,
+	gas?: string,
+	gasPrice?: string
+}
+
 export const call = async (
-	contractDeployments: {
-		address: string,
-		abi: any[]
-	},
+	deployment: Deployment,
 	functionName: string,
 	args?: any[],
-	options?: {
-		from?: string,
-		value?: string,
-		to?: string,
-		gas?: string,
-		gasPrice?: string
-	}
+	options?: CallOption
 ) => {
 	const accounts = await getAccounts()
-	const contractInterface = new utils.Interface(contractDeployments.abi)
+	const contractInterface = new utils.Interface(deployment.abi)
 	const data = contractInterface.encodeFunctionData(functionName, args)
 	const result = await window.ethereum.request({
 		method: 'eth_call',
 		params: [
 			{
 				from: options?.from || accounts[0],
-				to: options?.to || contractDeployments.address,
+				to: options?.to || deployment.address,
 				data,
 				value: options?.value,
 				gas: options?.gas,
@@ -35,29 +39,20 @@ export const call = async (
 }
 
 export const sendTransaction = async (
-	contractDeployments: {
-		address: string,
-		abi: any[]
-	},
+	deployment: Deployment,
 	functionName: string,
 	args?: any[],
-	options?: {
-		from?: string,
-		to?: string,
-		value?: string,
-		gas?: string,
-		gasPrice?: string
-	}
+	options?: CallOption
 ) => {
 	const accounts = await getAccounts()
-	const contractInterface = new utils.Interface(contractDeployments.abi)
+	const contractInterface = new utils.Interface(deployment.abi)
 	const data = contractInterface.encodeFunctionData(functionName, args)
 	return window.ethereum.request({
 		method: 'eth_sendTransaction',
 		params: [
 			{
 				from: options?.from || accounts[0],
-				to: options?.to || contractDeployments.address,
+				to: options?.to || deployment.address,
 				data,
 				value: options?.value,
 				gas: options?.gas,
@@ -66,7 +61,17 @@ export const sendTransaction = async (
 		]
 	})
 
+}
 
+export const getBalance = async (options?: CallOption) => {
+	const accounts = await getAccounts()
+
+	return window.ethereum.request({
+		method: 'eth_getBalance',
+		params: [
+			options?.from || accounts[0],
+		]
+	})
 }
 
 export const getAccounts = async (): Promise<string[]> => {
