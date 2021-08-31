@@ -1,20 +1,15 @@
 <template>
 	<div style="width:100%;">
 		<a-select
-			:default-value="erc20Index"
+			default-value="0"
 			@change="onTokenChanged"
 		>
-			<a-select-option value="0">
-				AB {{ erc20Addresses[0] }}
-			</a-select-option>
-			<a-select-option value="1">
-				DT {{ erc20Addresses[1] }}
-			</a-select-option>
-			<a-select-option value="2">
-				USDT {{ erc20Addresses[2] }}
-			</a-select-option>
-			<a-select-option value="3">
-				EVER {{ erc20Addresses[3] }}
+			<a-select-option
+				v-for="(token, i) of tokens"
+				:key="`${i}-${token.name}`"
+				:value="`${i}`"
+			>
+				{{ token.name }} {{ token.deployment.address }}
 			</a-select-option>
 		</a-select>
 	</div>
@@ -30,33 +25,31 @@ import MockEVER from '@/abi/MockEVER.json'
 
 @Component
 export default class Tokens extends Vue {
-	erc20Index = '0'
-	erc20Addresses = [
-		MockAB.address,
-		MockDT.address,
-		MockUSDT.address,
-		MockEVER.address
+	tokens = [
+		{
+			name: 'AB',
+			deployment: MockAB
+		},
+		{
+			name: 'DT',
+			deployment: MockDT
+		},
+		{
+			name: 'USDT',
+			deployment: MockUSDT
+		},
+		{
+			name: 'EVER',
+			deployment: MockEVER
+		}
 	]
 
 	async created() {
-		this.$emit('onTokenChanged', this.erc20Deployment)
+		this.$emit('onTokenChanged', this.tokens[0].deployment)
 	}
 
-	async onTokenChanged(value: string) {
-		this.erc20Index = value
-		this.$emit('onTokenChanged', this.erc20Deployment)
-	}
-
-	get erc20Deployment() {
-		if (this.erc20Index == '0') {
-			return MockAB
-		} else if (this.erc20Index == '1') {
-			return MockDT
-		} else if (this.erc20Index == '2') {
-			return MockUSDT
-		} else {
-			return MockEVER
-		}
+	async onTokenChanged(index: number) {
+		this.$emit('onTokenChanged', this.tokens[index].deployment)
 	}
 }
 </script>
