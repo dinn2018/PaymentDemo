@@ -14,9 +14,9 @@ const routes: RouteConfig[] = [
 		component: () => import(/* webpackChunkName: "calculation" */ '../views/calculation.vue'),
 	},
 	{
-		path: '/resources',
-		name: 'resources',
-		component: () => import(/* webpackChunkName: "resources" */ '../views/resources.vue'),
+		path: '/statistics',
+		name: 'statistics',
+		component: () => import(/* webpackChunkName: "resources" */ '../views/statistics.vue'),
 	},
 	{
 		path: '/buy',

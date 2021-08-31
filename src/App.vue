@@ -28,8 +28,8 @@
 					<router-link to="/calculation" />
 				</a-menu-item>
 				<a-menu-item key="3">
-					<span>Resources</span>
-					<router-link to="/resources" />
+					<span>Statistics</span>
+					<router-link to="/statistics" />
 				</a-menu-item>
 				<a-menu-item key="4">
 					<span>Buy</span>

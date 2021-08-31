@@ -43,7 +43,7 @@ import MockAB from '@/abi/MockAB.json'
 		Resources
 	}
 })
-export default class Calculations extends Vue {
+export default class Statistics extends Vue {
 	resource: Deployment = { address: '', abi: [] }
 
 	beneficiary = ''
