@@ -63,11 +63,7 @@ export default class Approve extends Vue {
 
 	async approve() {
 		const v = toToken(this.value)
-		const result = await sendTransaction(this.erc20Deployment, 'approve', [
-			this.spender,
-			v
-		])
-		console.log('approve', result)
+		await sendTransaction(this.erc20Deployment, 'approve', [this.spender, v])
 	}
 
 	async getAllowance() {

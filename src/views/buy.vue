@@ -8,39 +8,57 @@
 				<Resources @onResourceChanged="onResourceChanged" />
 			</a-form-item>
 			<a-form-item label="Pre path">
-				<a-input v-model="prePath" />
+				<PrePaths @onPathChanged="onPathChanged" />
 			</a-form-item>
-			<div class="buy">
-				<a-form-item label="Value In">
-					<a-input v-model="valueIn" />
-				</a-form-item>
-				<a-form-item label="Amount min out">
-					<a-input v-model="amountOutMin" />
-					<a-button
-						type="primary"
-						html-type="submit"
-						@click="buyWithExactValue"
+			<a-form-item label="Buy with exact value">
+				<a-card :bordered="true">
+					<div
+						class="calculation-card"
+						style="height:200px"
 					>
-						Buy with exact value
-					</a-button>
-				</a-form-item>
-			</div>
-			<div class="buy">
-				<a-form-item label="Amount Out">
-					<a-input v-model="amountOut" />
-				</a-form-item>
-				<a-form-item label="ValueIn Max">
-					<a-input v-model="valueInMax" />
-					<a-button
-						type="primary"
-						html-type="submit"
-						@click="buyWithExactResource"
+						<a-form>
+							<a-form-item label="Value In">
+								<a-input v-model="valueIn" />
+							</a-form-item>
+							<a-form-item label="Amount min out">
+								<a-input v-model="amountOutMin" />
+								<a-button
+									type="primary"
+									html-type="submit"
+									@click="buyWithExactValue"
+								>
+									Buy
+								</a-button>
+							</a-form-item>
+						</a-form>
+					</div>
+				</a-card>
+			</a-form-item>
+			<a-form-item label="Buy with exact resource">
+				<a-card :bordered="true">
+					<div
+						class="calculation-card"
+						style="height:200px"
 					>
-						Buy with exact resource
-					</a-button>
-				</a-form-item>
-			</div>
-			<div>My Resource Amount: {{ resourceBalance }}</div>
+						<a-form>
+							<a-form-item label="Amount Out">
+								<a-input v-model="amountOut" />
+							</a-form-item>
+							<a-form-item label="ValueIn Max">
+								<a-input v-model="valueInMax" />
+								<a-button
+									type="primary"
+									html-type="submit"
+									@click="buyWithExactResource"
+								>
+									Buy
+								</a-button>
+							</a-form-item>
+						</a-form>
+					</div>
+				</a-card>
+				<a-card>My Resource Amount: {{ resourceBalance }}</a-card>
+			</a-form-item>
 		</a-form>
 	</div>
 </template>
@@ -58,18 +76,19 @@ import {
 
 import Payment from '@/abi/Payment.json'
 import Resources from '@/components/resources.vue'
+import PrePaths from '@/components/pre-paths.vue'
 
 @Component({
 	components: {
-		Resources
+		Resources,
+		PrePaths
 	}
 })
 export default class Buy extends Vue {
 	resource: Deployment = { address: '', abi: [] }
 
-	// AB -> DT -> EVER
-	prePath =
-		'0x7a6ca1B5e1e5DDd9E5F4b4f685319f990A5585Db,0x455d2b264DC5b543014E24f8599b3E8177f73654,0xc0D05413823E6ebeA748285d468295eB384057A9'
+	prePath: string[] = []
+
 	valueIn = '0'
 	amountOutMin = '0'
 
@@ -86,6 +105,10 @@ export default class Buy extends Vue {
 		await this.getAccountAmount()
 	}
 
+	async onPathChanged(path: string[]) {
+		this.prePath = path
+	}
+
 	isETHValuated(token: string) {
 		return token == WETH
 	}
@@ -98,8 +121,7 @@ export default class Buy extends Vue {
 	async buyWithExactValue() {
 		try {
 			const value = toToken(this.valueIn)
-			const tokens = this.prePath.split(',')
-			const tokenIn = tokens[0]
+			const tokenIn = this.prePath[0]
 			if (this.isETHValuated(this.valuationToken)) {
 				if (this.isETHValuated(tokenIn)) {
 					await this.sendPayment(
@@ -111,7 +133,7 @@ export default class Buy extends Vue {
 					)
 				} else {
 					await this.sendPayment('buyETHValuatedResourceByExactToken', [
-						tokens,
+						this.prePath,
 						value,
 						this.amountOutMin,
 						defaultDeadline()
@@ -135,7 +157,7 @@ export default class Buy extends Vue {
 					} else {
 						await this.sendPayment(
 							'buyTokenValuatedResourceByOtherExactToken',
-							[tokens, value, this.amountOutMin, defaultDeadline()]
+							[this.prePath, value, this.amountOutMin, defaultDeadline()]
 						)
 					}
 				}
@@ -148,8 +170,7 @@ export default class Buy extends Vue {
 	async buyWithExactResource() {
 		try {
 			const valueMax = toToken(this.valueInMax)
-			const tokens = this.prePath.split(',')
-			const tokenIn = tokens[0]
+			const tokenIn = this.prePath[0]
 			if (this.isETHValuated(this.valuationToken)) {
 				if (this.isETHValuated(tokenIn)) {
 					await this.sendPayment(
@@ -161,7 +182,7 @@ export default class Buy extends Vue {
 					)
 				} else {
 					await this.sendPayment('buyExactETHValuatedResourceByToken', [
-						tokens,
+						this.prePath,
 						this.amountOut,
 						valueMax,
 						defaultDeadline()
@@ -179,14 +200,14 @@ export default class Buy extends Vue {
 				} else {
 					if (tokenIn == this.valuationToken) {
 						await this.sendPayment('buyExactTokenValuatedResourceByToken', [
-							tokens,
+							this.prePath,
 							this.amountOut,
 							valueMax
 						])
 					} else {
 						await this.sendPayment(
 							'buyExactTokenValuatedResourceByOtherToken',
-							[tokens, this.amountOut, valueMax, defaultDeadline()]
+							[this.prePath, this.amountOut, valueMax, defaultDeadline()]
 						)
 					}
 				}

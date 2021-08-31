@@ -8,16 +8,23 @@
 				<Resources @onResourceChanged="onResourceChanged" />
 			</a-form-item>
 			<a-form-item :wrapper-col="{ span: 12, offset: 5 }">
-				<div>Resource Beneficiary: {{ beneficiary }}</div>
-				<div>
-					Resource ValuationToken: {{ valuationTokenName }} {{ valuationToken }}
-				</div>
-				<div>Resource Beneficiary Balance: {{ beneficiaryBalance }}</div>
-				<div v-if="hasSwap">
-					<div>Resource Swap Beneficiary: {{ swapTo }}</div>
-					<div>Resource Swap Token:{{ swapTokenName }} {{ swapToken }}</div>
-					<div>Resource Swap Beneficiary Balance:{{ swapToBalance }}</div>
-				</div>
+				<a-card :bordered="true">
+					<div class="calculation-card">
+						<div>Resource Beneficiary: {{ beneficiary }}</div>
+						<div>
+							Resource ValuationToken: {{ valuationTokenName }}
+							{{ valuationToken }}
+						</div>
+						<div>Resource Beneficiary Balance: {{ beneficiaryBalance }}</div>
+						<div v-if="hasSwap">
+							<div>Resource Swap Receiver: {{ swapReceiver }}</div>
+							<div>Resource Swap Token:{{ swapTokenName }} {{ swapToken }}</div>
+							<div>
+								Resource Swap Receiver Balance:{{ swapReceiverBalance }}
+							</div>
+						</div>
+					</div>
+				</a-card>
 			</a-form-item>
 		</a-form>
 	</div>
@@ -46,18 +53,18 @@ export default class Calculations extends Vue {
 
 	hasSwap = false
 
-	swapTo = ''
+	swapReceiver = ''
 	swapToken = ''
 	swapTokenName = ''
-	swapToBalance = '0'
+	swapReceiverBalance = '0'
 
 	async onResourceChanged(resource: Deployment) {
 		this.resource = resource
 		try {
 			await this.getSwapToken()
-			await this.getSwapTo()
+			await this.getSwapReceiver()
 			await this.getSwapTokenName()
-			await this.getSwapToBalance()
+			await this.getSwapReceiverBalance()
 			this.hasSwap = true
 		} catch (e) {
 			this.hasSwap = false
@@ -117,25 +124,29 @@ export default class Calculations extends Vue {
 		}
 	}
 
-	async getSwapTo() {
+	async getSwapReceiver() {
 		if (this.swapToken) {
-			const result = await call(this.resource, 'swapTo')
-			this.swapTo = result.toString()
+			const result = await call(this.resource, 'swapReceiver')
+			this.swapReceiver = result.toString()
 		}
 	}
 
-	async getSwapToBalance() {
-		if (this.swapToken && this.swapTo) {
+	async getSwapReceiverBalance() {
+		if (this.swapToken && this.swapReceiver) {
 			if (this.valuationToken != WETH) {
-				const result = await call(MockAB, 'balanceOf', [this.swapTo], {
+				const result = await call(MockAB, 'balanceOf', [this.swapReceiver], {
 					to: this.swapToken
 				})
-				this.swapToBalance = formatToken(BigNumber.from(result.toString()))
+				this.swapReceiverBalance = formatToken(
+					BigNumber.from(result.toString())
+				)
 			} else {
 				const result = await getBalance({
-					from: this.swapTo
+					from: this.swapReceiver
 				})
-				this.swapToBalance = formatToken(BigNumber.from(result.toString()))
+				this.swapReceiverBalance = formatToken(
+					BigNumber.from(result.toString())
+				)
 			}
 		}
 	}
