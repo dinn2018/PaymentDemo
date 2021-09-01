@@ -1,13 +1,10 @@
 <template>
 	<div style="width:100%;">
-		<a-form
-			:label-col="{ span: 5 }"
-			:wrapper-col="{ span: 12 }"
-		>
+		<a-form>
 			<a-form-item label="Resource">
 				<Resources @onResourceChanged="onResourceChanged" />
 			</a-form-item>
-			<a-form-item :wrapper-col="{ span: 12, offset: 5 }">
+			<a-form-item>
 				<a-card :bordered="true">
 					<div class="calculation-card">
 						<div>Resource Beneficiary: {{ beneficiary }}</div>
@@ -133,9 +130,14 @@ export default class Statistics extends Vue {
 	async getSwapReceiverBalance() {
 		if (this.swapToken && this.swapReceiver) {
 			if (this.valuationToken != WETH) {
-				const result = await this.call(MockAB, 'balanceOf', [this.swapReceiver], {
-					to: this.swapToken
-				})
+				const result = await this.call(
+					MockAB,
+					'balanceOf',
+					[this.swapReceiver],
+					{
+						to: this.swapToken
+					}
+				)
 				this.swapReceiverBalance = formatToken(
 					BigNumber.from(result.toString())
 				)
