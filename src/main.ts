@@ -10,10 +10,24 @@ import mixin from '@/mixins'
 Vue.mixin(mixin)
 Vue.use(Antd)
 Vue.prototype.$message = message
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
-new Vue({
-	store,
-	router,
-	render: (h) => h(App),
-}).$mount('#app')
+(async () => {
+	try {
+		const accounts = await window.ethereum.request({
+			method: 'eth_accounts'
+		})
+		if (accounts.length > 0) {
+			store.init({
+				account: accounts[0],
+				chainId: window.ethereum.chainId
+			})
+		}
+	} finally {
+		new Vue({
+			store,
+			router,
+			render: (h) => h(App),
+		}).$mount('#app')
+	}
+})()

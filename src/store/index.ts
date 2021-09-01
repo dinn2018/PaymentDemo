@@ -28,6 +28,11 @@ class InvoiceStore extends Vuex.Store<AccountState>{
 		})
 	}
 
+	public init(state: AccountState) {
+		this.commit(UPDATE_ACCOUNT, state.account)
+		this.commit(UPDATE_CHAINID, state.chainId)
+	}
+
 }
 
 const store = new InvoiceStore()
