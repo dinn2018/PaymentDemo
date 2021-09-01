@@ -61,6 +61,7 @@ import { formatNetwork, isNetworkSupported } from '@/utils'
 @Component
 export default class App extends Vue {
 	async created() {
+		console.log(window.ethereum)
 		this.checkAccount()
 		this.listen()
 	}
@@ -95,6 +96,11 @@ export default class App extends Vue {
 	async connect() {
 		if (!window.ethereum) {
 			return this.$message.warn('Please install MetaMask to use this app.')
+		}
+
+		const isUnlocked = await window.ethereum._metamask.isUnlocked()
+		if (!isUnlocked) {
+			return this.$message.warn('Metamask has been locked, please unlock it.')
 		}
 
 		if (!isNetworkSupported(window.ethereum.chainId)) {
