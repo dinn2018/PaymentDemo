@@ -34,7 +34,6 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { BigNumber } from 'ethers'
 import { formatToken, WETH } from '@/utils'
-import { call, Deployment, getBalance } from '@/utils/eth'
 import Resources from '@/components/resources.vue'
 import MockAB from '@/abi/MockAB.json'
 
@@ -76,19 +75,19 @@ export default class Statistics extends Vue {
 	}
 
 	async getBeneficiary() {
-		const result = await call(this.resource, 'beneficiary')
+		const result = await this.call(this.resource, 'beneficiary')
 		this.beneficiary = result.toString()
 		return this.beneficiary
 	}
 
 	async getValuationToken() {
-		const result = await call(this.resource, 'valuationToken')
+		const result = await this.call(this.resource, 'valuationToken')
 		this.valuationToken = result.toString()
 		return this.valuationToken
 	}
 
 	async getValuationTokenName() {
-		const result = await call(MockAB, 'name', [], {
+		const result = await this.call(MockAB, 'name', [], {
 			to: this.valuationToken
 		})
 		this.valuationTokenName = result.toString()
@@ -97,12 +96,12 @@ export default class Statistics extends Vue {
 
 	async getBeneficiaryBalance() {
 		if (this.valuationToken != WETH) {
-			const result = await call(MockAB, 'balanceOf', [this.beneficiary], {
+			const result = await this.call(MockAB, 'balanceOf', [this.beneficiary], {
 				to: this.valuationToken
 			})
 			this.beneficiaryBalance = formatToken(BigNumber.from(result.toString()))
 		} else {
-			const result = await getBalance({
+			const result = await this.getBalance({
 				from: this.beneficiary
 			})
 			console.log(BigNumber.from(result.toString()))
@@ -111,13 +110,13 @@ export default class Statistics extends Vue {
 	}
 
 	async getSwapToken() {
-		const result = await call(this.resource, 'swapToken')
+		const result = await this.call(this.resource, 'swapToken')
 		this.swapToken = result.toString()
 	}
 
 	async getSwapTokenName() {
 		if (this.swapToken) {
-			const result = await call(MockAB, 'name', [], {
+			const result = await this.call(MockAB, 'name', [], {
 				to: this.swapToken
 			})
 			this.swapTokenName = result.toString()
@@ -126,7 +125,7 @@ export default class Statistics extends Vue {
 
 	async getSwapReceiver() {
 		if (this.swapToken) {
-			const result = await call(this.resource, 'swapReceiver')
+			const result = await this.call(this.resource, 'swapReceiver')
 			this.swapReceiver = result.toString()
 		}
 	}
@@ -134,14 +133,14 @@ export default class Statistics extends Vue {
 	async getSwapReceiverBalance() {
 		if (this.swapToken && this.swapReceiver) {
 			if (this.valuationToken != WETH) {
-				const result = await call(MockAB, 'balanceOf', [this.swapReceiver], {
+				const result = await this.call(MockAB, 'balanceOf', [this.swapReceiver], {
 					to: this.swapToken
 				})
 				this.swapReceiverBalance = formatToken(
 					BigNumber.from(result.toString())
 				)
 			} else {
-				const result = await getBalance({
+				const result = await this.getBalance({
 					from: this.swapReceiver
 				})
 				this.swapReceiverBalance = formatToken(

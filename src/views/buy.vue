@@ -66,13 +66,6 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { toToken, defaultDeadline, WETH } from '@/utils'
-import {
-	call,
-	sendTransaction,
-	getAccounts,
-	Deployment,
-	CallOption
-} from '@/utils/eth'
 
 import Payment from '@/abi/Payment.json'
 import Resources from '@/components/resources.vue'
@@ -114,7 +107,7 @@ export default class Buy extends Vue {
 	}
 
 	async getValuationToken() {
-		const result = await call(this.resource, 'valuationToken')
+		const result = await this.call(this.resource, 'valuationToken')
 		this.valuationToken = result.toString()
 	}
 
@@ -218,7 +211,7 @@ export default class Buy extends Vue {
 	}
 
 	async sendPayment(method: string, args: any[], options?: CallOption) {
-		await sendTransaction(
+		await this.sendTransaction(
 			Payment,
 			method,
 			[this.resource.address].concat(args),
@@ -227,8 +220,9 @@ export default class Buy extends Vue {
 	}
 
 	async getAccountAmount() {
-		const accounts = await getAccounts()
-		const result = await call(this.resource, 'balances', [accounts[0]])
+		const result = await this.call(this.resource, 'balances', [
+			await this.getAccount()
+		])
 		this.resourceBalance = result.toString()
 	}
 }

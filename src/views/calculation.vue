@@ -48,7 +48,6 @@
 import { Component, Vue } from 'vue-property-decorator'
 
 import { toToken, formatToken } from '@/utils'
-import { call, Deployment } from '@/utils/eth'
 import Resources from '@/components/resources.vue'
 import PrePaths from '@/components/pre-paths.vue'
 import Payment from '@/abi/Payment.json'
@@ -79,7 +78,7 @@ export default class Calculation extends Vue {
 
 	async getAmountOut() {
 		try {
-			const result = await call(Payment, 'getAmountOut', [
+			const result = await this.call(Payment, 'getAmountOut', [
 				this.resource.address,
 				this.prePath,
 				toToken(this.valueIn)
@@ -94,7 +93,7 @@ export default class Calculation extends Vue {
 	}
 
 	async getValuesIn() {
-		const result = await call(Payment, 'getValuesIn', [
+		const result = await this.call(Payment, 'getValuesIn', [
 			this.resource.address,
 			this.prePath,
 			this.amountOut
