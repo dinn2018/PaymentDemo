@@ -123,6 +123,9 @@ export default class App extends Vue {
 
 		window.ethereum.on('chainChanged', chainId => {
 			this.$store.commit(UPDATE_CHAINID, chainId)
+			if (isNetworkSupported(chainId)) {
+				window.location.reload()
+			}
 		})
 	}
 
