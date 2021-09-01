@@ -220,9 +220,8 @@ export default class Buy extends Vue {
 	}
 
 	async getAccountAmount() {
-		const result = await this.call(this.resource, 'balances', [
-			await this.getAccount()
-		])
+		const account = await this.getAccount()
+		const result = await this.call(this.resource, 'balances', [account])
 		this.resourceBalance = result.toString()
 	}
 }
