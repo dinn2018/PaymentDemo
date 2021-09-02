@@ -54,7 +54,11 @@
 						</a-form>
 					</div>
 				</a-card>
-				<a-card>My Resource Amount: {{ resourceBalance }}</a-card>
+				<a-card>
+					total: {{ resourceBalance[0] }}
+					<br>
+					left: {{ resourceBalance[1] }}
+				</a-card>
 			</a-form-item>
 		</a-form>
 	</div>
@@ -219,7 +223,7 @@ export default class Buy extends Vue {
 	async getAccountAmount() {
 		const account = await this.getAccount()
 		const result = await this.call(this.resource, 'balances', [account])
-		this.resourceBalance = result.toString()
+		this.resourceBalance = result
 	}
 }
 </script>
