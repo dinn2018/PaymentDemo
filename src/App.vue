@@ -61,7 +61,6 @@ import { formatNetwork, isNetworkSupported } from '@/utils'
 @Component
 export default class App extends Vue {
 	async created() {
-		console.log(window.ethereum)
 		this.checkAccount()
 		this.listen()
 	}

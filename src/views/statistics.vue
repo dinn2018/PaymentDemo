@@ -101,7 +101,6 @@ export default class Statistics extends Vue {
 			const result = await this.getBalance({
 				from: this.beneficiary
 			})
-			console.log(BigNumber.from(result.toString()))
 			this.beneficiaryBalance = formatToken(BigNumber.from(result.toString()))
 		}
 	}
