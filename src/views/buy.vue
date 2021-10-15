@@ -7,6 +7,15 @@
 			<a-form-item label="Pre path">
 				<PrePaths @onPathChanged="onPathChanged" />
 			</a-form-item>
+			<a-form-item label="Expiration">
+				<a-date-picker
+					v-model="expiration"
+					format="YYYY-MM-DD"
+					show-time
+					:disabled-date="disabledDate"
+					@ok="ok"
+				/>
+			</a-form-item>
 			<a-form-item label="Buy with exact value">
 				<a-card :bordered="true">
 					<div
@@ -67,10 +76,11 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { toToken, defaultDeadline, WETH } from '@/utils'
-
+import { utils } from 'ethers'
 import Payment from '@/abi/Payment.json'
 import Resources from '@/components/resources.vue'
 import PrePaths from '@/components/pre-paths.vue'
+import moment from 'moment'
 
 @Component({
 	components: {
@@ -92,6 +102,8 @@ export default class Buy extends Vue {
 	resourceBalance = '0'
 
 	valuationToken = ''
+
+	expiration: moment.Moment = moment()
 
 	async onResourceChanged(resource: Deployment) {
 		this.resource = resource
@@ -215,7 +227,7 @@ export default class Buy extends Vue {
 		await this.sendTransaction(
 			Payment,
 			method,
-			[this.resource.address].concat(args),
+			[this.resource.address].concat(args).concat([this.expirationUnixData]),
 			options
 		)
 	}
@@ -224,6 +236,17 @@ export default class Buy extends Vue {
 		const account = await this.getAccount()
 		const result = await this.call(this.resource, 'balances', [account])
 		this.resourceBalance = result
+	}
+
+	disabledDate(current: moment.Moment) {
+		// Can not select days before today and today
+		return current && current < moment().endOf('day')
+	}
+
+	ok(current: moment.Moment) {}
+
+	get expirationUnixData(): string {
+		return utils.defaultAbiCoder.encode(['uint256'], [this.expiration.unix()])
 	}
 }
 </script>
