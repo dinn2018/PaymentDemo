@@ -76,7 +76,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { toToken, defaultDeadline, WETH } from '@/utils'
-import { utils } from 'ethers'
+import { BigNumber, utils } from 'ethers'
 import Payment from '@/abi/Payment.json'
 import Resources from '@/components/resources.vue'
 import PrePaths from '@/components/pre-paths.vue'
@@ -228,7 +228,10 @@ export default class Buy extends Vue {
 			Payment,
 			method,
 			[this.resource.address].concat(args).concat([this.expirationUnixData]),
-			options
+			{
+				...options,
+				gasPrice: BigNumber.from(Number(2 * 1e9).toString()).toHexString()
+			}
 		)
 	}
 
