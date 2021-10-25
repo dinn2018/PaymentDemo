@@ -17,24 +17,16 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import StorageWithDeadline from '@/abi/StorageWithDeadline.json'
-import SimpleResourceERC20 from '@/abi/SimpleResourceERC20.json'
-import SimpleResourceETH from '@/abi/SimpleResourceETH.json'
+import StorageWithExpiration from '@/abi/StorageWithExpiration.json'
+// import SimpleResourceERC20 from '@/abi/SimpleResourceERC20.json'
+// import SimpleResourceETH from '@/abi/SimpleResourceETH.json'
 
 @Component
 export default class Resources extends Vue {
 	resources = [
 		{
-			name: 'StorageWithDeadline',
-			deployment: StorageWithDeadline
-		},
-		{
-			name: 'SimpleResourceERC20',
-			deployment: SimpleResourceERC20
-		},
-		{
-			name: 'SimpleResourceETH',
-			deployment: SimpleResourceETH
+			name: 'StorageWithExpiration',
+			deployment: StorageWithExpiration
 		}
 	]
 	async created() {
